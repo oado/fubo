@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>每日清单 · Daily Checklist</title>
+<style>
+  /* ===== Notion Design System Tokens ===== */
+  :root {
+    /* Warm Neutral Palette */
+    --color-bg: #ffffff;
+    --color-bg-warm: #f6f5f4;
+    --color-text-primary: rgba(0,0,0,0.95);
+    --color-text-secondary: #615d59;
+    --color-text-muted: #a39e98;
+    --color-text-placeholder: #c4bfb8;
+    --color-border: rgba(0,0,0,0.1);
+    --color-border-hover: rgba(0,0,0,0.18);
+    --color-divider: rgba(0,0,0,0.06);
+
+    /* Accent */
+    --color-accent: #0075de;
+    --color-accent-hover: #005bab;
+    --color-accent-light: #f2f9ff;
+    --color-focus: #097fe8;
+
+    /* Semantic */
+    --color-green: #1aae39;
+    --color-green-light: #eef8f0;
+    --color-green-bg: #dbeddb;
+    --color-teal: #2a9d99;
+    --color-teal-light: #e8f7f7;
+    --color-orange: #dd5b00;
+    --color-orange-light: #fdf1e7;
+    --color-pink: #ff64c8;
+    --color-pink-light: #fef0fa;
+    --color-purple: #6940a5;
+    --color-purple-light: #f0eafc;
+    --color-brown: #523410;
+    --color-brown-light: #f5efe8;
+    --color-red: #eb5757;
+    --color-red-light: #fde8e8;
+
+    /* Shadows */
+    --shadow-card: rgba(0,0,0,0.04) 0px 4px 18px, rgba(0,0,0,0.027) 0px 2px 7.85px, rgba(0,0,0,0.02) 0px 0.8px 2.93px, rgba(0,0,0,0.01) 0px 0.175px 1.04px;
+    --shadow-float: rgba(0,0,0,0.01) 0px 1px 3px, rgba(0,0,0,0.02) 0px 3px 7px, rgba(0,0,0,0.02) 0px 7px 15px, rgba(0,0,0,0.04) 0px 14px 28px, rgba(0,0,0,0.05) 0px 23px 52px;
+    --shadow-inline: rgba(0,0,0,0.06) 0px 1px 4px;
+
+    /* Radius */
+    --radius-xs: 4px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-pill: 9999px;
+
+    /* Typography */
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    --font-mono: 'SFMono-Regular', 'Menlo', 'Consolas', monospace;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+  body {
+    font-family: var(--font);
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    min-height: 100vh;
+    line-height: 1.5;
+    font-size: 16px;
+    font-weight: 400;
+  }
+
+  /* ===== Layout ===== */
+  .app {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* ===== Header ===== */
+  .header {
+    margin-bottom: 40px;
+    animation: slideDown 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 4px;
+  }
+
+  .header-date {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    letter-spacing: 0.5px;
+  }
+
+  .header-nav {
+    display: flex;
+    gap: 4px;
+  }
+
+  .header-nav-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xs);
+    background: var(--color-bg);
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+  }
+  .header-nav-btn:hover { background: var(--color-bg-warm); border-color: var(--color-border-hover); }
+  .header-nav-btn:active { transform: scale(0.92); }
+
+  .header-greeting {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.625px;
+    color: var(--color-text-primary);
+    line-height: 1.23;
+  }
+
+  .header-sub {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  /* ===== Progress Overview ===== */
+  .progress-overview {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 32px;
+    animation: slideUp 0.5s cubic-bezier(0.4,0,0.2,1) 0.1s both;
+  }
+
+  .progress-card {
+    flex: 1;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    transition: box-shadow 0.2s ease;
+  }
+  .progress-card:hover { box-shadow: var(--shadow-card); }
+
+  .progress-card-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    letter-spacing: 0.125px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  .progress-card-value {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    line-height: 1;
+  }
+  .progress-card-value.green { color: var(--color-green); }
+  .progress-card-value.accent { color: var(--color-accent); }
+  .progress-card-value.teal { color: var(--color-teal); }
+
+  .progress-card-bar {
+    height: 4px;
+    background: var(--color-bg-warm);
+    border-radius: 2px;
+    margin-top: 10px;
+    overflow: hidden;
+  }
+  .progress-card-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+    width: 0%;
+  }
+  .progress-card-fill.green { background: var(--color-green); }
+  .progress-card-fill.accent { background: var(--color-accent); }
+  .progress-card-fill.teal { background: var(--color-teal); }
+
+  /* ===== Section ===== */
+  .section {
+    margin-bottom: 28px;
+    animation: slideUp 0.5s cubic-bezier(0.4,0,0.2,1) both;
+  }
+  .section:nth-child(2) { animation-delay: 0.15s; }
+  .section:nth-child(3) { animation-delay: 0.2s; }
+  .section:nth-child(4) { animation-delay: 0.25s; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding: 0 2px;
+  }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    letter-spacing: 0.125px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .section-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: var(--radius-pill);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.125px;
+  }
+  .section-badge.green { background: var(--color-green-light); color: var(--color-green); }
+  .section-badge.accent { background: var(--color-accent-light); color: var(--color-accent); }
+  .section-badge.teal { background: var(--color-teal-light); color: var(--color-teal); }
+  .section-badge.pink { background: var(--color-pink-light); color: var(--color-pink); }
+
+  .section-action {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--radius-xs);
+    transition: all 0.15s ease;
+  }
+  .section-action:hover { color: var(--color-text-secondary); background: var(--color-bg-warm); }
+
+  /* ===== Task Card ===== */
+  .task-card {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+  }
+  .task-card:hover { box-shadow: var(--shadow-card); }
+
+  /* ===== Task Item ===== */
+  .task-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--color-divider);
+    transition: background 0.15s ease;
+    cursor: default;
+    animation: itemIn 0.25s cubic-bezier(0.4,0,0.2,1) both;
+  }
+  .task-item:last-child { border-bottom: none; }
+  .task-item:hover { background: rgba(0,0,0,0.008); }
+  .task-item.done { opacity: 0.6; }
+  .task-item.removing {
+    animation: itemOut 0.25s cubic-bezier(0.4,0,0.2,1) forwards;
+  }
+  .task-item.completing {
+    animation: itemComplete 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* Checkbox */
+  .task-check {
+    width: 18px;
+    height: 18px;
+    border-radius: var(--radius-xs);
+    border: 1.5px solid var(--color-border-hover);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    position: relative;
+    background: var(--color-bg);
+  }
+  .task-check:hover { border-color: var(--color-text-secondary); }
+  .task-check.checked {
+    background: var(--color-green);
+    border-color: var(--color-green);
+  }
+  .task-check.checked::after {
+    content: '';
+    width: 5px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg) translate(-0.5px, -0.5px);
+  }
+
+  /* Goal-linked checkbox */
+  .task-check.goal-linked {
+    border-radius: 50%;
+  }
+  .task-check.goal-linked.checked {
+    background: var(--color-teal);
+    border-color: var(--color-teal);
+  }
+
+  /* Routine checkbox */
+  .task-check.routine {
+    border-radius: 50%;
+  }
+  .task-check.routine.checked {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .task-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .task-text {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--color-text-primary);
+    line-height: 1.4;
+    transition: all 0.2s ease;
+    word-break: break-word;
+  }
+  .task-item.done .task-text {
+    text-decoration: line-through;
+    color: var(--color-text-muted);
+  }
+
+  .task-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+  }
+
+  .task-goal-tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 1px 6px;
+    border-radius: var(--radius-pill);
+    letter-spacing: 0.125px;
+  }
+  .task-goal-tag.teal { background: var(--color-teal-light); color: var(--color-teal); }
+  .task-goal-tag.purple { background: var(--color-purple-light); color: var(--color-purple); }
+  .task-goal-tag.brown { background: var(--color-brown-light); color: var(--color-brown); }
+  .task-goal-tag.pink { background: var(--color-pink-light); color: var(--color-pink); }
+  .task-goal-tag.orange { background: var(--color-orange-light); color: var(--color-orange); }
+  .task-goal-tag.accent { background: var(--color-accent-light); color: var(--color-accent); }
+
+  .task-time {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    font-weight: 400;
+  }
+
+  .task-delete {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    font-size: 14px;
+    border-radius: var(--radius-xs);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    opacity: 0;
+    flex-shrink: 0;
+  }
+  .task-item:hover .task-delete { opacity: 1; }
+  .task-delete:hover { background: var(--color-red-light); color: var(--color-red); }
+
+  /* ===== Input Row ===== */
+  .input-row {
+    display: flex;
+    gap: 8px;
+    padding: 10px 14px;
+    border-top: 1px solid var(--color-divider);
+    background: var(--color-bg-warm);
+  }
+
+  .input-field {
+    flex: 1;
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: var(--radius-xs);
+    padding: 6px 10px;
+    font-size: 14px;
+    font-family: var(--font);
+    color: var(--color-text-primary);
+    background: var(--color-bg);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    min-width: 0;
+  }
+  .input-field::placeholder { color: var(--color-text-placeholder); }
+  .input-field:focus {
+    border-color: var(--color-focus);
+    box-shadow: 0 0 0 2px rgba(9,127,232,0.15);
+  }
+
+  .input-select {
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: var(--radius-xs);
+    padding: 6px 8px;
+    font-size: 12px;
+    font-family: var(--font);
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    background: var(--color-bg);
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+    -webkit-appearance: none;
+    appearance: none;
+    min-width: 0;
+  }
+  .input-select:focus {
+    border-color: var(--color-focus);
+  }
+
+  .btn-add-task {
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius-xs);
+    padding: 6px 14px;
+    font-size: 14px;
+    font-family: var(--font);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .btn-add-task:hover { background: var(--color-accent-hover); }
+  .btn-add-task:active { transform: scale(0.95); }
+
+  .btn-add-joy {
+    background: var(--color-teal);
+    color: white;
+    border: none;
+    border-radius: var(--radius-xs);
+    padding: 6px 14px;
+    font-size: 14px;
+    font-family: var(--font);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .btn-add-joy:hover { background: #238e8a; }
+  .btn-add-joy:active { transform: scale(0.95); }
+
+  /* ===== Joy Item ===== */
+  .joy-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--color-divider);
+    animation: itemIn 0.25s cubic-bezier(0.4,0,0.2,1) both;
+  }
+  .joy-item:last-child { border-bottom: none; }
+  .joy-item.removing {
+    animation: itemOut 0.25s cubic-bezier(0.4,0,0.2,1) forwards;
+  }
+
+  .joy-emoji {
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    width: 20px;
+    text-align: center;
+  }
+
+  .joy-content { flex: 1; min-width: 0; }
+
+  .joy-text {
+    font-size: 14px;
+    color: var(--color-text-primary);
+    line-height: 1.5;
+    word-break: break-word;
+  }
+
+  .joy-time {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
+
+  .joy-delete {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    font-size: 14px;
+    border-radius: var(--radius-xs);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    opacity: 0;
+    flex-shrink: 0;
+  }
+  .joy-item:hover .joy-delete { opacity: 1; }
+  .joy-delete:hover { background: var(--color-red-light); color: var(--color-red); }
+
+  /* ===== Goals Section ===== */
+  .goals-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+    animation: slideUp 0.5s cubic-bezier(0.4,0,0.2,1) 0.08s both;
+  }
+
+  .goal-pill {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    transition: all 0.15s ease;
+    letter-spacing: 0.125px;
+  }
+  .goal-pill:hover { box-shadow: var(--shadow-inline); }
+  .goal-pill.active { border-color: transparent; }
+  .goal-pill.active.teal { background: var(--color-teal-light); border-color: var(--color-teal); }
+  .goal-pill.active.purple { background: var(--color-purple-light); border-color: var(--color-purple); }
+  .goal-pill.active.brown { background: var(--color-brown-light); border-color: var(--color-brown); }
+  .goal-pill.active.pink { background: var(--color-pink-light); border-color: var(--color-pink); }
+  .goal-pill.active.orange { background: var(--color-orange-light); border-color: var(--color-orange); }
+  .goal-pill.active.accent { background: var(--color-accent-light); border-color: var(--color-accent); }
+
+  .goal-pill-icon { font-size: 13px; }
+  .goal-pill-name { color: var(--color-text-secondary); }
+  .goal-pill.active .goal-pill-name { color: var(--color-text-primary); }
+
+  .goal-pill-count {
+    min-width: 16px;
+    height: 16px;
+    border-radius: var(--radius-pill);
+    font-size: 10px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    background: rgba(0,0,0,0.06);
+    color: var(--color-text-muted);
+  }
+  .goal-pill.active .goal-pill-count { background: rgba(0,0,0,0.1); color: var(--color-text-secondary); }
+
+  /* ===== Empty State ===== */
+  .empty-state {
+    padding: 28px 14px;
+    text-align: center;
+    color: var(--color-text-muted);
+  }
+  .empty-state-icon {
+    font-size: 24px;
+    margin-bottom: 6px;
+    opacity: 0.5;
+  }
+  .empty-state-text {
+    font-size: 13px;
+    font-weight: 400;
+  }
+
+  /* ===== Quote ===== */
+  .quote-section {
+    text-align: center;
+    margin-top: 48px;
+    padding: 24px;
+    animation: slideUp 0.5s cubic-bezier(0.4,0,0.2,1) 0.3s both;
+  }
+  .quote-text {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    line-height: 1.8;
+    font-style: italic;
+  }
+  .quote-author {
+    font-size: 12px;
+    color: var(--color-text-placeholder);
+    margin-top: 4px;
+  }
+
+  /* ===== Toast ===== */
+  .toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    pointer-events: none;
+  }
+  .toast {
+    background: var(--color-text-primary);
+    color: white;
+    padding: 8px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(-12px);
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    margin-bottom: 8px;
+    pointer-events: none;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ===== Modal ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal-overlay.active { display: flex; }
+
+  .modal {
+    background: var(--color-bg);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 420px;
+    box-shadow: var(--shadow-float);
+    animation: modalIn 0.3s cubic-bezier(0.4,0,0.2,1);
+    overflow: hidden;
+  }
+
+  .modal-header {
+    padding: 20px 24px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.25px;
+  }
+
+  .modal-close {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    font-size: 18px;
+    border-radius: var(--radius-xs);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+  }
+  .modal-close:hover { background: var(--color-bg-warm); color: var(--color-text-secondary); }
+
+  .modal-body { padding: 16px 24px 24px; }
+
+  .modal-field { margin-bottom: 14px; }
+  .modal-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    margin-bottom: 6px;
+    display: block;
+    letter-spacing: 0.125px;
+  }
+  .modal-input {
+    width: 100%;
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: var(--radius-xs);
+    padding: 8px 12px;
+    font-size: 14px;
+    font-family: var(--font);
+    color: var(--color-text-primary);
+    background: var(--color-bg);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .modal-input:focus {
+    border-color: var(--color-focus);
+    box-shadow: 0 0 0 2px rgba(9,127,232,0.15);
+  }
+
+  .color-options {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .color-option {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .color-option:hover { transform: scale(1.15); }
+  .color-option.selected { border-color: var(--color-text-primary); }
+  .color-option.selected::after {
+    content: '✓';
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+
+  .btn-modal {
+    border: none;
+    border-radius: var(--radius-xs);
+    padding: 8px 16px;
+    font-size: 14px;
+    font-family: var(--font);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-modal:active { transform: scale(0.95); }
+  .btn-modal-secondary {
+    background: rgba(0,0,0,0.05);
+    color: var(--color-text-primary);
+  }
+  .btn-modal-secondary:hover { background: rgba(0,0,0,0.08); }
+  .btn-modal-primary {
+    background: var(--color-accent);
+    color: white;
+  }
+  .btn-modal-primary:hover { background: var(--color-accent-hover); }
+
+  /* ===== Animations ===== */
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes itemIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes itemOut {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(20px); }
+  }
+  @keyframes itemComplete {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 600px) {
+    .app { padding: 24px 16px 64px; }
+    .header-greeting { font-size: 22px; }
+    .progress-overview { gap: 8px; }
+    .progress-card { padding: 12px; }
+    .progress-card-value { font-size: 24px; }
+    .goals-bar { gap: 6px; }
+    .goal-pill { padding: 5px 10px; font-size: 11px; }
+  }
+  @media (max-width: 380px) {
+    .progress-overview { flex-direction: column; gap: 8px; }
+    .input-row { flex-wrap: wrap; }
+  }
+
+  /* ===== Scrollbar ===== */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
+
+  /* ===== Streak ===== */
+  .streak-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: var(--radius-pill);
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--color-orange-light);
+    color: var(--color-orange);
+  }
+</style>
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Goal Edit Modal -->
+<div class="modal-overlay" id="goalModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="goalModalTitle">添加目标</div>
+      <button class="modal-close" id="goalModalClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-field">
+        <label class="modal-label">目标名称</label>
+        <input class="modal-input" id="goalNameInput" type="text" placeholder="如：保持健康" maxlength="20">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">选择颜色</label>
+        <div class="color-options" id="goalColorOptions">
+          <div class="color-option selected" data-color="teal" style="background:var(--color-teal)"></div>
+          <div class="color-option" data-color="purple" style="background:var(--color-purple)"></div>
+          <div class="color-option" data-color="brown" style="background:var(--color-brown)"></div>
+          <div class="color-option" data-color="pink" style="background:var(--color-pink)"></div>
+          <div class="color-option" data-color="orange" style="background:var(--color-orange)"></div>
+          <div class="color-option" data-color="accent" style="background:var(--color-accent)"></div>
+        </div>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">图标</label>
+        <div class="color-options" id="goalIconOptions">
+          <div class="color-option selected" data-icon="🎯" style="background:var(--color-bg-warm);font-size:14px">🎯</div>
+          <div class="color-option" data-icon="💪" style="background:var(--color-bg-warm);font-size:14px">💪</div>
+          <div class="color-option" data-icon="📚" style="background:var(--color-bg-warm);font-size:14px">📚</div>
+          <div class="color-option" data-icon="🧘" style="background:var(--color-bg-warm);font-size:14px">🧘</div>
+          <div class="color-option" data-icon="💰" style="background:var(--color-bg-warm);font-size:14px">💰</div>
+          <div class="color-option" data-icon="🎨" style="background:var(--color-bg-warm);font-size:14px">🎨</div>
+          <div class="color-option" data-icon="🤝" style="background:var(--color-bg-warm);font-size:14px">🤝</div>
+          <div class="color-option" data-icon="🌍" style="background:var(--color-bg-warm);font-size:14px">🌍</div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-modal btn-modal-secondary" id="goalModalCancel">取消</button>
+        <button class="btn-modal btn-modal-primary" id="goalModalSave">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-top">
+      <div class="header-date" id="headerDate"></div>
+      <div class="header-nav">
+        <button class="header-nav-btn" id="btnPrev" title="前一天">‹</button>
+        <button class="header-nav-btn" id="btnToday" title="今天" style="font-size:11px;font-weight:600;width:auto;padding:0 10px;">今天</button>
+        <button class="header-nav-btn" id="btnNext" title="后一天">›</button>
+      </div>
+    </div>
+    <div class="header-greeting" id="headerGreeting"></div>
+    <div class="header-sub" id="headerSub"></div>
+  </header>
+
+  <!-- Goals Bar -->
+  <div class="goals-bar" id="goalsBar"></div>
+
+  <!-- Progress Overview -->
+  <div class="progress-overview">
+    <div class="progress-card">
+      <div class="progress-card-label">日常惯例</div>
+      <div class="progress-card-value accent" id="routineProgress">0/0</div>
+      <div class="progress-card-bar"><div class="progress-card-fill accent" id="routineFill"></div></div>
+    </div>
+    <div class="progress-card">
+      <div class="progress-card-label">今日事项</div>
+      <div class="progress-card-value green" id="taskProgress">0/0</div>
+      <div class="progress-card-bar"><div class="progress-card-fill green" id="taskFill"></div></div>
+    </div>
+    <div class="progress-card">
+      <div class="progress-card-label">小确幸</div>
+      <div class="progress-card-value teal" id="joyProgress">0</div>
+      <div class="progress-card-bar"><div class="progress-card-fill teal" id="joyFill"></div></div>
+    </div>
+  </div>
+
+  <!-- Daily Routines -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">
+        日常惯例 <span class="section-badge accent" id="routineBadge">0</span>
+      </div>
+      <button class="section-action" id="btnAddRoutine">+ 添加惯例</button>
+    </div>
+    <div class="task-card" id="routineCard"></div>
+  </div>
+
+  <!-- Today's Tasks -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">
+        今日事项 <span class="section-badge green" id="taskBadge">0</span>
+      </div>
+      <button class="section-action" id="btnAddTask">+ 添加事项</button>
+    </div>
+    <div class="task-card" id="taskCard"></div>
+  </div>
+
+  <!-- Small Joys -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">
+        小确幸 <span class="section-badge teal" id="joyBadge">0</span>
+      </div>
+    </div>
+    <div class="task-card" id="joyCard"></div>
+  </div>
+
+  <!-- Quote -->
+  <div class="quote-section">
+    <div class="quote-text" id="quoteText"></div>
+    <div class="quote-author" id="quoteAuthor"></div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ==================== Utils ====================
+  const $ = s => document.getElementById(s);
+  const esc = s => { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
+
+  function dateKey(date) {
+    const d = date || new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function load(k, fb) { try { return JSON.parse(localStorage.getItem(k)) || fb; } catch { return fb; } }
+  function save(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
+
+  function fmtTime(d) { return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
+
+  // ==================== State ====================
+  let currentDate = new Date();
+  let activeGoalFilter = null; // null = all
+
+  // Persistent: goals (not per-day)
+  let goals = load('dc_goals', [
+    { id: 'g1', name: '保持健康', color: 'teal', icon: '💪' },
+    { id: 'g2', name: '持续学习', color: 'purple', icon: '📚' },
+    { id: 'g3', name: '内心平静', color: 'brown', icon: '🧘' },
+  ]);
+
+  // Persistent: routines (repeat daily, checked state resets per day)
+  let routines = load('dc_routines', [
+    { id: 'r1', text: '晨间冥想 10 分钟', goalId: 'g3' },
+    { id: 'r2', text: '运动 30 分钟', goalId: 'g1' },
+    { id: 'r3', text: '阅读 20 页', goalId: 'g2' },
+    { id: 'r4', text: '感恩日记', goalId: 'g3' },
+  ]);
+
+  // Per-day: routine check states, tasks, joys
+  let dayData = loadDayData();
+
+  function loadDayData() {
+    const key = dateKey(currentDate);
+    return load(`dc_day_${key}`, {
+      routineChecks: {},  // { routineId: true/false }
+      tasks: [],           // [{ id, text, done, goalId, time }]
+      joys: [],            // [{ id, text, icon, time }]
+    });
+  }
+
+  function saveDayData() {
+    save(`dc_day_${dateKey(currentDate)}`, dayData);
+  }
+
+  function saveGoals() { save('dc_goals', goals); }
+  function saveRoutines() { save('dc_routines', routines); }
+
+  let uid = Date.now();
+  function genId() { return 'id_' + (++uid); }
+
+  // ==================== Toast ====================
+  function toast(msg) {
+    const c = $('toastContainer');
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    c.appendChild(t);
+    requestAnimationFrame(() => { t.classList.add('show'); });
+    setTimeout(() => {
+      t.classList.remove('show');
+      setTimeout(() => t.remove(), 300);
+    }, 1600);
+  }
+
+  // ==================== Header ====================
+  function renderHeader() {
+    const d = currentDate;
+    const weekdays = ['日','一','二','三','四','五','六'];
+    const now = new Date();
+    const isToday = dateKey(d) === dateKey(now);
+
+    $('headerDate').textContent = `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 · 星期${weekdays[d.getDay()]}`;
+
+    const h = now.getHours();
+    let greet = '';
+    if (isToday) {
+      if (h < 6) greet = '夜深了，好梦 🌙';
+      else if (h < 9) greet = '早安，新的一天 ☀️';
+      else if (h < 12) greet = '上午好 🌿';
+      else if (h < 14) greet = '午安，记得休息 🍱';
+      else if (h < 18) greet = '下午好 💪';
+      else if (h < 21) greet = '傍晚好 🌅';
+      else greet = '晚安 🌙';
+    } else {
+      greet = `${d.getMonth()+1}月${d.getDate()}日`;
+    }
+    $('headerGreeting').textContent = greet;
+
+    // Streak calculation
+    let streak = 0;
+    let checkDate = new Date(now);
+    checkDate.setDate(checkDate.getDate() - 1);
+    while (true) {
+      const dk = dateKey(checkDate);
+      const dd = load(`dc_day_${dk}`, null);
+      if (!dd) break;
+      const allRoutineChecked = routines.length > 0 && routines.every(r => dd.routineChecks && dd.routineChecks[r.id]);
+      if (allRoutineChecked) {
+        streak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+    // Check today
+    if (isToday && routines.length > 0 && routines.every(r => dayData.routineChecks[r.id])) {
+      streak++;
+    }
+
+    let sub = '';
+    if (streak > 0) sub = `连续 ${streak} 天完成惯例 `;
+    const totalToday = routines.length + dayData.tasks.length;
+    const doneToday = routines.filter(r => dayData.routineChecks[r.id]).length + dayData.tasks.filter(t => t.done).length;
+    if (totalToday > 0) sub += `· 今日 ${doneToday}/${totalToday} 完成`;
+
+    $('headerSub').innerHTML = sub
+      ? (streak > 0 ? `<span class="streak-badge">🔥 ${streak}天</span> ` : '') + `<span style="color:var(--color-text-muted);font-size:13px">${streak > 0 ? '· ' : ''}${doneToday}/${totalToday} 完成</span>`
+      : '';
+  }
+
+  // ==================== Goals Bar ====================
+  function renderGoalsBar() {
+    const bar = $('goalsBar');
+    bar.innerHTML = '';
+
+    // "All" pill
+    const allPill = document.createElement('div');
+    allPill.className = `goal-pill${activeGoalFilter === null ? ' active' : ''}`;
+    allPill.style.cssText = activeGoalFilter === null ? 'background:var(--color-bg-warm);border-color:var(--color-text-muted);' : '';
+    allPill.innerHTML = `<span class="goal-pill-name">全部</span>`;
+    allPill.addEventListener('click', () => { activeGoalFilter = null; renderAll(); });
+    bar.appendChild(allPill);
+
+    goals.forEach(g => {
+      const pill = document.createElement('div');
+      pill.className = `goal-pill${activeGoalFilter === g.id ? ' active ' + g.color : ''}`;
+      // Count tasks for this goal
+      const routineCount = routines.filter(r => r.goalId === g.id && !dayData.routineChecks[r.id]).length;
+      const taskCount = dayData.tasks.filter(t => t.goalId === g.id && !t.done).length;
+      const total = routineCount + taskCount;
+
+      pill.innerHTML = `
+        <span class="goal-pill-icon">${g.icon}</span>
+        <span class="goal-pill-name">${esc(g.name)}</span>
+        <span class="goal-pill-count">${total}</span>
+      `;
+      pill.addEventListener('click', () => {
+        activeGoalFilter = activeGoalFilter === g.id ? null : g.id;
+        renderAll();
+      });
+      bar.appendChild(pill);
+    });
+
+    // Add goal button
+    const addPill = document.createElement('div');
+    addPill.className = 'goal-pill';
+    addPill.style.cssText = 'cursor:pointer;border-style:dashed;';
+    addPill.innerHTML = `<span class="goal-pill-name" style="color:var(--color-text-muted)">+ 目标</span>`;
+    addPill.addEventListener('click', () => openGoalModal());
+    bar.appendChild(addPill);
+  }
+
+  // ==================== Routines ====================
+  function renderRoutines() {
+    const card = $('routineCard');
+    card.innerHTML = '';
+
+    const filtered = activeGoalFilter
+      ? routines.filter(r => r.goalId === activeGoalFilter)
+      : routines;
+
+    if (filtered.length === 0) {
+      card.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔄</div><div class="empty-state-text">添加每天重复的习惯</div></div>`;
+    } else {
+      filtered.forEach(r => {
+        const checked = !!dayData.routineChecks[r.id];
+        const goal = goals.find(g => g.id === r.goalId);
+        const item = document.createElement('div');
+        item.className = `task-item${checked ? ' done' : ''}`;
+        item.innerHTML = `
+          <div class="task-check routine${checked ? ' checked' : ''}" data-rid="${r.id}"></div>
+          <div class="task-content">
+            <div class="task-text">${esc(r.text)}</div>
+            ${goal ? `<div class="task-meta"><span class="task-goal-tag ${goal.color}">${goal.icon} ${esc(goal.name)}</span></div>` : ''}
+          </div>
+          <button class="task-delete" data-rid="${r.id}">✕</button>
+        `;
+        card.appendChild(item);
+      });
+    }
+
+    // Update badge & progress
+    const total = routines.length;
+    const done = routines.filter(r => dayData.routineChecks[r.id]).length;
+    $('routineBadge').textContent = `${done}/${total}`;
+    $('routineProgress').textContent = `${done}/${total}`;
+    $('routineFill').style.width = total ? (done / total * 100) + '%' : '0%';
+  }
+
+  // ==================== Tasks ====================
+  function renderTasks() {
+    const card = $('taskCard');
+    card.innerHTML = '';
+
+    const filtered = activeGoalFilter
+      ? dayData.tasks.filter(t => t.goalId === activeGoalFilter)
+      : dayData.tasks;
+
+    if (filtered.length === 0) {
+      card.innerHTML = `<div class="empty-state"><div class="empty-state-icon">✏️</div><div class="empty-state-text">写下今天要完成的事</div></div>`;
+    } else {
+      // Not done first
+      const sorted = [...filtered].sort((a, b) => a.done - b.done);
+      sorted.forEach(t => {
+        const goal = goals.find(g => g.id === t.goalId);
+        const item = document.createElement('div');
+        item.className = `task-item${t.done ? ' done' : ''}`;
+        item.innerHTML = `
+          <div class="task-check${t.goalId ? ' goal-linked' : ''}${t.done ? ' checked' : ''}" data-tid="${t.id}"></div>
+          <div class="task-content">
+            <div class="task-text">${esc(t.text)}</div>
+            <div class="task-meta">
+              ${goal ? `<span class="task-goal-tag ${goal.color}">${goal.icon} ${esc(goal.name)}</span>` : ''}
+              <span class="task-time">${t.time || ''}</span>
+            </div>
+          </div>
+          <button class="task-delete" data-tid="${t.id}">✕</button>
+        `;
+        card.appendChild(item);
+      });
+    }
+
+    const total = dayData.tasks.length;
+    const done = dayData.tasks.filter(t => t.done).length;
+    $('taskBadge').textContent = `${done}/${total}`;
+    $('taskProgress').textContent = `${done}/${total}`;
+    $('taskFill').style.width = total ? (done / total * 100) + '%' : '0%';
+  }
+
+  // ==================== Joys ====================
+  const joyEmojis = ['🌸','✨','🌈','🦋','🕊️','💫','🌿','🎐','🍒','🎶','🍵','🌻','💫','🌙','🎈'];
+
+  function renderJoys() {
+    const card = $('joyCard');
+    card.innerHTML = '';
+
+    if (dayData.joys.length === 0) {
+      card.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🍀</div><div class="empty-state-text">记录今天的小确幸</div></div>`;
+    } else {
+      dayData.joys.forEach(j => {
+        const item = document.createElement('div');
+        item.className = 'joy-item';
+        item.innerHTML = `
+          <span class="joy-emoji">${j.icon || '🍀'}</span>
+          <div class="joy-content">
+            <div class="joy-text">${esc(j.text)}</div>
+            <div class="joy-time">${j.time || ''}</div>
+          </div>
+          <button class="joy-delete" data-jid="${j.id}">✕</button>
+        `;
+        card.appendChild(item);
+      });
+    }
+
+    $('joyBadge').textContent = dayData.joys.length;
+    $('joyProgress').textContent = dayData.joys.length;
+    // Joy "progress" = how many recorded (max 5 for visual)
+    const joyPct = Math.min(dayData.joys.length / 5 * 100, 100);
+    $('joyFill').style.width = joyPct + '%';
+  }
+
+  // ==================== Add Routines/Tasks inline ====================
+  function showRoutineInput() {
+    const card = $('routineCard');
+    // Check if already has input
+    if (card.querySelector('.input-row')) return;
+
+    const row = document.createElement('div');
+    row.className = 'input-row';
+    row.innerHTML = `
+      <input class="input-field" id="newRoutineText" type="text" placeholder="添加新的日常惯例..." maxlength="60">
+      <select class="input-select" id="newRoutineGoal">
+        <option value="">无目标</option>
+        ${goals.map(g => `<option value="${g.id}">${g.icon} ${g.name}</option>`).join('')}
+      </select>
+      <button class="btn-add-task" id="saveNewRoutine">添加</button>
+    `;
+    card.appendChild(row);
+
+    const inp = $('newRoutineText');
+    inp.focus();
+
+    function addIt() {
+      const text = inp.value.trim();
+      if (!text) { row.remove(); return; }
+      const goalId = $('newRoutineGoal').value || null;
+      routines.push({ id: genId(), text, goalId });
+      saveRoutines();
+      row.remove();
+      renderAll();
+      toast('已添加惯例 ✓');
+    }
+
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') addIt(); if (e.key === 'Escape') row.remove(); });
+    $('saveNewRoutine').addEventListener('click', addIt);
+  }
+
+  function showTaskInput() {
+    const card = $('taskCard');
+    if (card.querySelector('.input-row')) return;
+
+    const row = document.createElement('div');
+    row.className = 'input-row';
+    row.innerHTML = `
+      <input class="input-field" id="newTaskText" type="text" placeholder="添加今日事项..." maxlength="80">
+      <select class="input-select" id="newTaskGoal">
+        <option value="">无目标</option>
+        ${goals.map(g => `<option value="${g.id}">${g.icon} ${g.name}</option>`).join('')}
+      </select>
+      <button class="btn-add-task" id="saveNewTask">添加</button>
+    `;
+    card.appendChild(row);
+
+    const inp = $('newTaskText');
+    inp.focus();
+
+    function addIt() {
+      const text = inp.value.trim();
+      if (!text) { row.remove(); return; }
+      const goalId = $('newTaskGoal').value || null;
+      dayData.tasks.push({ id: genId(), text, done: false, goalId, time: fmtTime(new Date()) });
+      saveDayData();
+      row.remove();
+      renderAll();
+      toast('已添加事项 ✓');
+    }
+
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') addIt(); if (e.key === 'Escape') row.remove(); });
+    $('saveNewTask').addEventListener('click', addIt);
+  }
+
+  function showJoyInput() {
+    const card = $('joyCard');
+    if (card.querySelector('.input-row')) return;
+
+    const row = document.createElement('div');
+    row.className = 'input-row';
+    row.innerHTML = `
+      <input class="input-field" id="newJoyText" type="text" placeholder="今天的小确幸是..." maxlength="120">
+      <button class="btn-add-joy" id="saveNewJoy">记录</button>
+    `;
+    card.appendChild(row);
+
+    const inp = $('newJoyText');
+    inp.focus();
+
+    function addIt() {
+      const text = inp.value.trim();
+      if (!text) { row.remove(); return; }
+      const icon = joyEmojis[Math.floor(Math.random() * joyEmojis.length)];
+      dayData.joys.push({ id: genId(), text, icon, time: fmtTime(new Date()) });
+      saveDayData();
+      row.remove();
+      renderAll();
+      toast('记下了 🍀');
+    }
+
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') addIt(); if (e.key === 'Escape') row.remove(); });
+    $('saveNewJoy').addEventListener('click', addIt);
+  }
+
+  // ==================== Event Delegation ====================
+  $('routineCard').addEventListener('click', e => {
+    const check = e.target.closest('.task-check');
+    const del = e.target.closest('.task-delete');
+    if (check && check.dataset.rid) {
+      const rid = check.dataset.rid;
+      dayData.routineChecks[rid] = !dayData.routineChecks[rid];
+      saveDayData();
+      const item = check.closest('.task-item');
+      if (dayData.routineChecks[rid]) {
+        item.classList.add('completing');
+        toast('完成 🎉');
+      }
+      setTimeout(() => renderAll(), dayData.routineChecks[rid] ? 300 : 0);
+    }
+    if (del && del.dataset.rid) {
+      const rid = del.dataset.rid;
+      const item = del.closest('.task-item');
+      item.classList.add('removing');
+      setTimeout(() => {
+        routines = routines.filter(r => r.id !== rid);
+        delete dayData.routineChecks[rid];
+        saveRoutines();
+        saveDayData();
+        renderAll();
+        toast('已删除惯例');
+      }, 250);
+    }
+  });
+
+  $('taskCard').addEventListener('click', e => {
+    const check = e.target.closest('.task-check');
+    const del = e.target.closest('.task-delete');
+    if (check && check.dataset.tid) {
+      const tid = check.dataset.tid;
+      const task = dayData.tasks.find(t => t.id === tid);
+      if (task) {
+        task.done = !task.done;
+        saveDayData();
+        const item = check.closest('.task-item');
+        if (task.done) {
+          item.classList.add('completing');
+          toast('完成 🎉');
+        }
+        setTimeout(() => renderAll(), task.done ? 300 : 0);
+      }
+    }
+    if (del && del.dataset.tid) {
+      const tid = del.dataset.tid;
+      const item = del.closest('.task-item');
+      item.classList.add('removing');
+      setTimeout(() => {
+        dayData.tasks = dayData.tasks.filter(t => t.id !== tid);
+        saveDayData();
+        renderAll();
+      }, 250);
+    }
+  });
+
+  $('joyCard').addEventListener('click', e => {
+    const del = e.target.closest('.joy-delete');
+    if (del && del.dataset.jid) {
+      const jid = del.dataset.jid;
+      const item = del.closest('.joy-item');
+      item.classList.add('removing');
+      setTimeout(() => {
+        dayData.joys = dayData.joys.filter(j => j.id !== jid);
+        saveDayData();
+        renderAll();
+      }, 250);
+    }
+  });
+
+  $('btnAddRoutine').addEventListener('click', showRoutineInput);
+  $('btnAddTask').addEventListener('click', showTaskInput);
+
+  // Click joy card empty area to add
+  $('joyCard').addEventListener('click', e => {
+    if (e.target.closest('.joy-item') || e.target.closest('.input-row') || e.target.closest('.joy-delete')) return;
+    showJoyInput();
+  });
+
+  // ==================== Date Navigation ====================
+  function changeDate(offset) {
+    currentDate.setDate(currentDate.getDate() + offset);
+    dayData = loadDayData();
+    activeGoalFilter = null;
+    renderAll();
+  }
+
+  $('btnPrev').addEventListener('click', () => changeDate(-1));
+  $('btnNext').addEventListener('click', () => changeDate(1));
+  $('btnToday').addEventListener('click', () => {
+    currentDate = new Date();
+    dayData = loadDayData();
+    activeGoalFilter = null;
+    renderAll();
+  });
+
+  // ==================== Goal Modal ====================
+  let editingGoalId = null;
+  let selectedGoalColor = 'teal';
+  let selectedGoalIcon = '🎯';
+
+  function openGoalModal(goalId) {
+    editingGoalId = goalId || null;
+    if (editingGoalId) {
+      const g = goals.find(g => g.id === editingGoalId);
+      if (g) {
+        $('goalNameInput').value = g.name;
+        selectedGoalColor = g.color;
+        selectedGoalIcon = g.icon;
+        $('goalModalTitle').textContent = '编辑目标';
+      }
+    } else {
+      $('goalNameInput').value = '';
+      selectedGoalColor = 'teal';
+      selectedGoalIcon = '🎯';
+      $('goalModalTitle').textContent = '添加目标';
+    }
+    updateGoalColorSelection();
+    updateGoalIconSelection();
+    $('goalModal').classList.add('active');
+    setTimeout(() => $('goalNameInput').focus(), 100);
+  }
+
+  function closeGoalModal() {
+    $('goalModal').classList.remove('active');
+    editingGoalId = null;
+  }
+
+  function updateGoalColorSelection() {
+    $('goalColorOptions').querySelectorAll('.color-option').forEach(el => {
+      el.classList.toggle('selected', el.dataset.color === selectedGoalColor);
+    });
+  }
+
+  function updateGoalIconSelection() {
+    $('goalIconOptions').querySelectorAll('.color-option').forEach(el => {
+      el.classList.toggle('selected', el.dataset.icon === selectedGoalIcon);
+    });
+  }
+
+  $('goalColorOptions').addEventListener('click', e => {
+    const opt = e.target.closest('.color-option');
+    if (opt && opt.dataset.color) {
+      selectedGoalColor = opt.dataset.color;
+      updateGoalColorSelection();
+    }
+  });
+
+  $('goalIconOptions').addEventListener('click', e => {
+    const opt = e.target.closest('.color-option');
+    if (opt && opt.dataset.icon) {
+      selectedGoalIcon = opt.dataset.icon;
+      updateGoalIconSelection();
+    }
+  });
+
+  $('goalModalSave').addEventListener('click', () => {
+    const name = $('goalNameInput').value.trim();
+    if (!name) { toast('请输入目标名称'); return; }
+    if (editingGoalId) {
+      const g = goals.find(g => g.id === editingGoalId);
+      if (g) { g.name = name; g.color = selectedGoalColor; g.icon = selectedGoalIcon; }
+    } else {
+      goals.push({ id: genId(), name, color: selectedGoalColor, icon: selectedGoalIcon });
+    }
+    saveGoals();
+    closeGoalModal();
+    renderAll();
+    toast(editingGoalId ? '目标已更新' : '目标已添加 ✓');
+  });
+
+  $('goalModalCancel').addEventListener('click', closeGoalModal);
+  $('goalModalClose').addEventListener('click', closeGoalModal);
+  $('goalModal').addEventListener('click', e => { if (e.target === $('goalModal')) closeGoalModal(); });
+  $('goalNameInput').addEventListener('keydown', e => { if (e.key === 'Enter') $('goalModalSave').click(); });
+
+  // ==================== Quote ====================
+  const quotes = [
+    { text: '生活不是等待暴风雨过去，而是学会在雨中翩翩起舞。', author: '维维安·格林' },
+    { text: '幸福不是拥有更多，而是计较更少。', author: '爱比克泰德' },
+    { text: '把每一个平凡的日子，过成值得回忆的样子。', author: '' },
+    { text: '人生没有白走的路，每一步都算数。', author: '' },
+    { text: '你不必生来勇敢，天赋过人。只要能投入勤奋，诚诚恳恳。', author: '' },
+    { text: '世界上只有一种英雄主义，就是看清生活的真相之后，依然热爱生活。', author: '罗曼·罗兰' },
+    { text: '每一个不曾起舞的日子，都是对生命的辜负。', author: '尼采' },
+    { text: '生活中最大的幸福，是坚信有人爱我们。', author: '雨果' },
+    { text: '慢慢来，比较快。', author: '' },
+    { text: '认真生活，就能找到生活藏起来的糖果。', author: '' },
+    { text: '日日行，不怕千万里；常常做，不怕千万事。', author: '' },
+    { text: '种一棵树最好的时间是十年前，其次是现在。', author: '' },
+    { text: '我们不是在寻找意义，而是在创造意义。', author: '' },
+    { text: '小事做起，持续做，比偶尔做大事更有力量。', author: '' },
+  ];
+
+  function renderQuote() {
+    const q = quotes[Math.floor(Math.random() * quotes.length)];
+    $('quoteText').textContent = `「${q.text}」`;
+    $('quoteAuthor').textContent = q.author ? `—— ${q.author}` : '';
+  }
+
+  // ==================== Render All ====================
+  function renderAll() {
+    renderHeader();
+    renderGoalsBar();
+    renderRoutines();
+    renderTasks();
+    renderJoys();
+  }
+
+  // ==================== Init ====================
+  renderAll();
+  renderQuote();
+
+  // Auto-refresh on day change
+  let lastDateKey = dateKey(new Date());
+  setInterval(() => {
+    const nk = dateKey(new Date());
+    if (nk !== lastDateKey) {
+      lastDateKey = nk;
+      // If viewing today, refresh
+      if (dateKey(currentDate) === lastDateKey) {
+        currentDate = new Date();
+        dayData = loadDayData();
+        renderAll();
+        toast('新的一天 🌅');
+      }
+    }
+  }, 30000);
+
+  // Keyboard shortcut: T for today
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 't' || e.key === 'T') {
+      currentDate = new Date();
+      dayData = loadDayData();
+      activeGoalFilter = null;
+      renderAll();
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
